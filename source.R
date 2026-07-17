@@ -30,12 +30,12 @@ plan(multisession, workers = 10)
 
 #------------- dados espaciais ------------#
 # shapefile GVE
-oname <- load("G:/CCD/CVE/RESPIRATORIAS/08_COQUELUCHE/6_ dashboard/APP/4_dados/shp_gve.RData")
+oname <- load("raw_data/shp_gve.RData")
 shp_gve <- get(oname);rm(list=oname);gc()
 shp_gve <- shp_gve %>%
     mutate(z=0)
 ## dados dos municípios por GVE ##
-oname <- load("G:/CCD/CVE/RESPIRATORIAS/15_ROTINAS_GAL/3_dashboard/dados/geo_full.RData")
+oname <- load("raw_data/geo_full.RData")
 dfgeo <- get(oname);rm(list=oname);gc()
 dfgeo <- select(dfgeo,ID_MUN,MUN,GVE)
 ## shapefiles dos municípios ##
