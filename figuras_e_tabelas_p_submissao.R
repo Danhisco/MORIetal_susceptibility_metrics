@@ -1,4 +1,4 @@
-# primeiro rodar: G:/CCD/CVE/RESPIRATORIAS/13_PROJ_SARAMPO/26_calculate_agregados_espaciais_suscetiveis.R
+# primeiro rodar: source.R
 # Instalar e carregar o pacote extrafont
 # install.packages("extrafont")
 library(extrafont)
