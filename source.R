@@ -49,7 +49,7 @@ dfnb <- right_join(x=dfmun,y=dfgeo)
 
 #------------- dados suscetibilidade ------------#
 ##@ população total e proporção de suscetíveis ##@
-df_ad <- readRDS(file="7_produtos/agregados_espaciais/df_suscetiveis.rds") %>%
+df_ad <- readRDS(file="raw_data/df_suscetiveis.rds") %>%
     mutate(fxet = gsub(" anos","",fx_et) %>% gsub(" a ","-",.)) %>%
     select(-c(fx_et:n_D2))
 df_ad <- rbind(
@@ -83,7 +83,7 @@ f_arrumar_nome <- \(vname){
     paste(lret,collapse="-")
 }
 #@1) matriz de contatos
-df_contact <- read.csv("4_bases/finalsize/contact_matrix.csv")
+df_contact <- read.csv("raw_data/contact_matrix.csv")
 vnames <- gsub("_","-",df_contact$X) %>%
     gsub("00","01",.) %>%
     sapply(.,f_arrumar_nome)
@@ -132,7 +132,9 @@ f_df_p_bolsao <- \(dfi){
 df_Bij <- split(df_contato,seq(nrow(df_contato))) %>%
     future_lapply(.,f_df_p_bolsao) %>%
     do.call("rbind",.)
-write_csv(df_Bij,file = "8_pastas_auxiliares/artigo_suscetiveis/csv/df_Bij.csv")
+#
+dir.create("csv")
+write_csv(df_Bij,file = "csv/df_Bij.csv")
 
 #@3) Calculo de Bi
 df_Bi <- lapply(vnames,\(li){
@@ -148,7 +150,7 @@ df_Bi <- lapply(vnames,\(li){
     relocate(dfret,fxet)
 }) %>% do.call("rbind",.)
 df_Bi <- right_join(dfnb,df_Bi)
-write_csv(df_Bi,file = "8_pastas_auxiliares/artigo_suscetiveis/csv/df_Bi.csv")
+write_csv(df_Bi,file = "csv/df_Bi.csv")
 
 #--------- tabela guia para as análises -------#
 f_fxet_comb <- \(vfxet=unique(df_ad$fxet)){
@@ -272,7 +274,8 @@ df_global_pop <- rbind(
                ifelse(pvalue<0.05,"*","")
            )
     )
-write_csv(df_global_pop,file = "8_pastas_auxiliares/artigo_suscetiveis/csv/globalMoran_pop.csv")
+write_csv(df_global_pop,
+          file = "csv/globalMoran_pop.csv")
 
 
 #-------- proporção de suscetiveis ----------------
@@ -298,7 +301,8 @@ df_global_psus <- rbind(
                ifelse(pvalue<0.05,"*","")
            )
     )
-write_csv(df_global_psus,file = "8_pastas_auxiliares/artigo_suscetiveis/csv/globalMoran_psus.csv")
+write_csv(df_global_psus,
+          file = "csv/globalMoran_psus.csv")
 
 #-------- bolsão de suscetibilidade ----------------
 ##@ univariado
@@ -328,7 +332,8 @@ df_global_bsus <- rbind(
                ifelse(pvalue<0.05,"*","")
            )
     )
-write_csv(df_global_bsus,file = "8_pastas_auxiliares/artigo_suscetiveis/csv/globalMoran_bsus.csv")
+write_csv(df_global_bsus,
+          file = "csv/globalMoran_bsus.csv")
 
 
 #-------- Impacto marginal na suscetibilidade ----------------
@@ -359,7 +364,8 @@ df_global_Isus <- rbind(
                ifelse(pvalue<0.05,"*","")
            )
     )
-write_csv(df_global_Isus,file = "8_pastas_auxiliares/artigo_suscetiveis/csv/globalMoran_Isus.csv")
+write_csv(df_global_Isus,
+          file = "csv/globalMoran_Isus.csv")
 
 
 #---------------------------------------------------------------------
@@ -480,7 +486,7 @@ names(lLISA_pop) <- mutate(df_sig_pop,vname = paste(x,y,sep=" : ")) %>%
     pull(vname)
 dftow <- lapply(lLISA_pop,st_drop_geometry) %>% do.call("rbind",.)
 rownames(dftow) <- NULL
-write_csv(dftow,file = "8_pastas_auxiliares/artigo_suscetiveis/csv/LISA_pop.csv")
+write_csv(dftow,file = "csv/LISA_pop.csv")
 
 
 #------------- proporção de suscetíveis ---------
@@ -493,7 +499,7 @@ names(lLISA_psus) <- mutate(df_sig_psus,vname = paste(x,y,sep=" : ")) %>%
     pull(vname)
 dftow <- lapply(lLISA_psus,st_drop_geometry) %>% do.call("rbind",.)
 rownames(dftow) <- NULL
-write_csv(dftow,file = "8_pastas_auxiliares/artigo_suscetiveis/csv/LISA_psus.csv")
+write_csv(dftow,file = "csv/LISA_psus.csv")
 
 
 #------------- bolsão de suscetíveis ---------
@@ -506,7 +512,7 @@ names(lLISA_bsus) <- mutate(df_sig_bsus,vname = paste(x,y,sep=" : ")) %>%
     pull(vname)
 dftow <- lapply(lLISA_bsus,st_drop_geometry) %>% do.call("rbind",.)
 rownames(dftow) <- NULL
-write_csv(dftow,file = "8_pastas_auxiliares/artigo_suscetiveis/csv/LISA_bsus.csv")
+write_csv(dftow,file = "csv/LISA_bsus.csv")
 
 
 #------------- Impacto marginal na sustibilidade ---------
@@ -519,7 +525,7 @@ names(lLISA_Isus) <- mutate(df_sig_Isus,vname = paste(x,y,sep=" : ")) %>%
     pull(vname)
 dftow <- lapply(lLISA_Isus,st_drop_geometry) %>% do.call("rbind",.)
 rownames(dftow) <- NULL
-write_csv(dftow,file = "8_pastas_auxiliares/artigo_suscetiveis/csv/LISA_Isus.csv")
+write_csv(dftow,file = "csv/LISA_Isus.csv")
 
 
 #---------------------------------------------------------------------
@@ -546,7 +552,7 @@ f_ij <- \(dff){
     inner_join(x=dfmun,dff)
 }
 #
-lf <- list.files(path="8_pastas_auxiliares/artigo_suscetiveis/csv",
+lf <- list.files(path="csv",
                  pattern="LISA_",
                  full.names = TRUE)
 names(lf) <- str_extract(lf, "(?<=LISA_).*?(?=\\.csv)")
