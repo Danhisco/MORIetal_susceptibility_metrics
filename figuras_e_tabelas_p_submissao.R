@@ -29,12 +29,11 @@ p <- df_contato %>%
     scale_x_discrete(expand=FALSE) +
     theme(legend.position = "none",
           text = element_text(family = "Times New Roman", size = 12))
-ggsave(filename = "8_pastas_auxiliares/artigo_suscetiveis/figuras/figSI1.jpeg",
+dir.create("figuras")
+ggsave(filename = "figuras/figSI1.jpeg",
        plot=p,
        width = 6.37,
        height = 7.15)
-# f_img("8_pastas_auxiliares/artigo_suscetiveis/figuras/mat_contato.jpeg")
-
 
 #--------------------------- raw values ------------------------------
 f_plot_raw <- \(dfi,
@@ -107,7 +106,8 @@ lp <- lapply(names(lp),\(li){
 
 })
 pfinal_rawpop <- f_wrap_plots(lp)
-ggsave(filename="8_pastas_auxiliares/artigo_suscetiveis/figuras/map_raw_values/overall_population.jpeg",
+dir.create("figuras/map_raw_values")
+ggsave(filename="figuras/map_raw_values/overall_population.jpeg",
        plot=pfinal_rawpop,
        dpi=200,
        width=14,
@@ -124,7 +124,7 @@ lp <- lapply(names(lp),\(li){
                fillname="proportion of\nsusceptibles")
 })
 pfinal_rawprop <- f_wrap_plots(lp)
-ggsave(filename="8_pastas_auxiliares/artigo_suscetiveis/figuras/map_raw_values/prop_susceptibles.jpeg",
+ggsave(filename="figuras/map_raw_values/prop_susceptibles.jpeg",
        plot=pfinal_rawprop,
        dpi=200,
        width=14,
@@ -144,7 +144,7 @@ lp <- lapply(names(lp),\(li){
                fillname="Pockets of\nsusceptibility")
 })
 pfinal_rawpockets <- f_wrap_plots(lp)
-ggsave(filename="8_pastas_auxiliares/artigo_suscetiveis/figuras/map_raw_values/pockets_susceptibility.jpeg",
+ggsave(filename="figuras/map_raw_values/pockets_susceptibility.jpeg",
        plot=pfinal_rawpockets,
        dpi=200,
        width=14,
@@ -164,7 +164,7 @@ lp <- lapply(names(lp),\(li){
                fillname="Marginal\nsusceptible\ncontribution")
 })
 pfinal_rawpockets <- f_wrap_plots(lp)
-ggsave(filename="8_pastas_auxiliares/artigo_suscetiveis/figuras/map_raw_values/marginal_susceptibility_impact.jpeg",
+ggsave(filename="figuras/map_raw_values/marginal_susceptibility_impact.jpeg",
        plot=pfinal_rawpockets,
        dpi=200,
        width=14,
@@ -236,7 +236,7 @@ lp$Isus <- f_add_title(
 
 #@ gráfico composto
 heatmap_final <- wrap_plots(lp,ncol=2)
-ggsave(filename="8_pastas_auxiliares/artigo_suscetiveis/figuras/fig3.jpeg",
+ggsave(filename="figuras/fig3.jpeg",
        plot = heatmap_final,
        dpi=120,
        width = 8,
@@ -337,8 +337,9 @@ f_plotLISA <- \(dfi,
 ##@ overall pop
 lp <- lapply(lLISA_pop,f_plotLISA)
 names(lp) <- gsub(" : ","_",names(lp))
+dir.create("figuras/LISA/pop")
 lapply(names(lp),\(li){
-    vpath <- paste0("8_pastas_auxiliares/artigo_suscetiveis/figuras/LISA/pop/",li,".jpeg")
+    vpath <- paste0("figuras/LISA/pop/",li,".jpeg")
     ggsave(filename = vpath,
            plot=lp[[li]],
            dpi=120,
@@ -349,8 +350,9 @@ lapply(names(lp),\(li){
 ##@ psus
 lp <- lapply(lLISA_psus,f_plotLISA)
 names(lp) <- gsub(" : ","_",names(lp))
+dir.create("figuras/LISA/psus")
 lapply(names(lp),\(li){
-    vpath <- paste0("8_pastas_auxiliares/artigo_suscetiveis/figuras/LISA/psus/",li,".jpeg")
+    vpath <- paste0("figuras/LISA/psus/",li,".jpeg")
     ggsave(filename = vpath,
            plot=lp[[li]],
            dpi=120,
@@ -361,8 +363,9 @@ lapply(names(lp),\(li){
 ##@ bsus
 lp <- lapply(lLISA_bsus,f_plotLISA,dfref=df_global_bsus)
 names(lp) <- gsub(" : ","_",names(lp))
+dir.create("figuras/LISA/bsus")
 lapply(names(lp),\(li){
-    vpath <- paste0("8_pastas_auxiliares/artigo_suscetiveis/figuras/LISA/bsus/",li,".jpeg")
+    vpath <- paste0("figuras/LISA/bsus/",li,".jpeg")
     ggsave(filename = vpath,
            plot=lp[[li]],
            dpi=120,
@@ -373,8 +376,9 @@ lapply(names(lp),\(li){
 ##@ Isus
 lp <- lapply(lLISA_Isus,f_plotLISA,dfref=df_global_Isus)
 names(lp) <- gsub(" : ","_",names(lp))
+dir.create("figuras/LISA/Isus")
 lapply(names(lp),\(li){
-    vpath <- paste0("8_pastas_auxiliares/artigo_suscetiveis/figuras/LISA/Isus/",li,".jpeg")
+    vpath <- paste0("figuras/LISA/Isus/",li,".jpeg")
     ggsave(filename = vpath,
            plot=lp[[li]],
            dpi=120,
@@ -384,8 +388,25 @@ lapply(names(lp),\(li){
 
 
 #------------------------- summary LISA PLOT -------------------------------
+f_mapelements <- \(condicao){
+    if (condicao) {
+        # Agrupa as camadas em uma lista para que o '+' do ggplot2 saiba adicioná-las
+        list(
+            # 2. Adiciona a Barra de Escala (canto inferior esquerdo)
+            annotation_scale(location = "bl", width_hint = 0.3, style = "ticks"),
+            # 3. Adiciona o Norte (canto superior direito)
+            annotation_north_arrow(location = "bl",
+                                   which_north = "true",
+                                   pad_x = unit(0.75, "in"),
+                                   pad_y = unit(0.5, "in"),
+                                   style = north_arrow_fancy_orienteering)
+            )
+        } else {
+            NULL
+        }
+    }
 f_plot_summaryLISA <- \(dff,
-                        vposleg=c(0.9,0.8),
+                        vposleg=c(0.9,0.79),
                         stripsize=12){
     facetlab <- gsub("bsus","C) Pockets of susceptibility",dff$base[1]) %>%
         gsub("Isus","D) Marginal susceptible contribution",.) %>%
@@ -410,11 +431,7 @@ f_plot_summaryLISA <- \(dff,
         coord_sf(expand = FALSE) +
         facet_wrap(~facetlab) +
         theme_bw() +
-        annotation_north_arrow(location = "bl",
-                               which_north = "true",
-                               pad_x = unit(0.75, "in"),
-                               pad_y = unit(0.5, "in"),
-                               style = north_arrow_fancy_orienteering) +
+        f_mapelements(grepl("D)",facetlab)) +
         theme(legend.position = "inside",
               text=element_text(family="Times New Roman",size=12),
               legend.position.inside = vposleg,
@@ -432,7 +449,7 @@ f_plot_summaryLISA <- \(dff,
 }
 lp_summaryLISA <- lapply(l_summaryLISA[c("pop","psus","bsus","Isus")],f_plot_summaryLISA)
 psummaryLISA <- wrap_plots(lp_summaryLISA,nrow=2)
-ggsave(filename = "8_pastas_auxiliares/artigo_suscetiveis/figuras/fig4.jpeg",
+ggsave(filename = "figuras/fig4.jpeg",
        plot=psummaryLISA,
        dpi=200,
        width = 16,
@@ -489,7 +506,7 @@ f_plotAgregados <- \(dff,
 }
 lp_cont <- lapply(l_graphHH[c("pop","psus","bsus","Isus")],f_plotAgregados,vposleg=c(0.85,0.8))
 p_compsize <- wrap_plots(lp_cont,ncol=2)
-ggsave(filename = "8_pastas_auxiliares/artigo_suscetiveis/figuras/figSI2.jpeg",
+ggsave(filename = "figuras/figSI2.jpeg",
        plot=p_compsize,
        dpi=200,
        width = 16,
@@ -536,7 +553,7 @@ boxplot_final <- wrap_plots(lp,ncol=2) +
         plot.margin = margin(5, 5, 5, 5),
         axis.title = element_text(size = 9)
     )
-ggsave(filename="8_pastas_auxiliares/artigo_suscetiveis/figuras/fig1.jpeg",
+ggsave(filename="figuras/fig1.jpeg",
        plot=boxplot_final,
        dpi=120,
        width=10,
@@ -618,7 +635,7 @@ p <- df_cor %>%
           strip.background = element_blank(),
           plot.title = element_text(margin = margin(b = -10))
     )
-ggsave(filename="8_pastas_auxiliares/artigo_suscetiveis/figuras/fig2.jpeg",
+ggsave(filename="figuras/fig2.jpeg",
        plot = p,
        width = 6.5,
        height = 7.5,
@@ -709,10 +726,11 @@ f_flextable <- \(dfi=dftofx){
     # flextable::width(j = c("dAICc", "df", "weight", "dev.expl"), width = 6.5/5, unit = "in")
 }
 dffx <- f_flextable()
-save_as_image(dffx, path = "8_pastas_auxiliares/artigo_suscetiveis/figuras/tabela1.png")
+dir.create("tabelas")
+save_as_image(dffx, path = "tabelas/tabela1.png")
 save_as_docx(
     dffx,
-    path = "8_pastas_auxiliares/artigo_suscetiveis/figuras/tabela1.docx"
+    path = "tabelas/tabela1.docx"
 )
 
 
@@ -836,10 +854,10 @@ f_flextable <- \(dfi=df_comp){
         width(j = "idsMUN", width = 3)
 }
 dffx <- f_flextable()
-save_as_image(dffx, path = "8_pastas_auxiliares/artigo_suscetiveis/figuras/tabelaSI2.png")
+save_as_image(dffx, path = "tabelas/tabelaSI2.png")
 save_as_docx(
     dffx,
-    path = "8_pastas_auxiliares/artigo_suscetiveis/figuras/tabelaSI2.docx",
+    path = "tabelas/tabelaSI2.docx",
     pr_section = prop_section(
         page_size = page_size(orient = "landscape"),
         type = "continuous"
@@ -848,7 +866,7 @@ save_as_docx(
 
 
 #-------------------------- arrumar todas as figuras
-lf <- list.files(path="8_pastas_auxiliares/artigo_suscetiveis/figuras",
+lf <- list.files(path="figuras",
                  pattern=".jpeg",
                  full.names=TRUE,
                  recursive=TRUE)
